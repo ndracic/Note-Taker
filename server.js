@@ -12,13 +12,13 @@ const writeFileAsync = util.promisify(fs.writeFile);
 
 // Middleware for parsing JSON and urlencoded form data
 //data parsing
-app.use(express.static('./develop/public'));
+app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //api route get req
 app.get("/api/notes", (req,res) => {
-  readFileAsync("./db/db.json", "utf-8").then(function(data) {
+  readFileAsync("db/db.json", "utf-8").then(function(data) {
     notes =[].concat(JSON.parse(data))
     res.json(notes);
   })
@@ -26,20 +26,20 @@ app.get("/api/notes", (req,res) => {
 
 app.post("/api/notes", (req,res)=>{
   const note = req.body
-  readFileAsync("./develop/db/db.json", "utf-8").then(function(data){
+  readFileAsync("db/db.json", "utf-8").then(function(data){
     notes =[].concat(JSON.parse(data));
-    note.id =note.length + 1
+    note.id = notes.length + 1
     notes.push(note);
     return notes
   }).then(function(notes) {
-    writeFileAsync('./develop/db/db.json'.JSON.stringify(notes))
+    writeFileAsync('db/db.json',JSON.stringify(notes))
     res.json(note);
   })
 });
 
 app.delete('/api/notes/:id', (req,res)=>{
   const idToDelete = parseInt(req.params.id);
-  readFileAsync('./develop.db/db.json', 'utf-8').then(function(data){
+  readFileAsync('db/db.json', 'utf-8').then(function(data){
     const notes =[].concat(JSON.parse(data));
     const newNotes = []
     for(let i=0;i<notes.length;i++){
@@ -49,20 +49,20 @@ app.delete('/api/notes/:id', (req,res)=>{
     }
     return newNotes
   }).then(function(notes) {
-    writeFileAsync('./develop/db/db.json', json.stringify(notes))
+    writeFileAsync('db/db.json', JSON.stringify(notes))
     res.send('saved!')
   })
 })
 
 // GET Route for html
+app.get('/notes', (req, res) =>
+  res.sendFile(path.join(__dirname, 'public/notes.html'))
+);
 app.get('/', (req, res) =>
-  res.sendFile(path.join(__dirname, '/develop/public/index.html'))
+  res.sendFile(path.join(__dirname, 'public/index.html'))
 );
 app.get('*', (req, res) =>
-  res.sendFile(path.join(__dirname, '/develop/public/index.html'))
-);
-app.get('/notes', (req, res) =>
-  res.sendFile(path.join(__dirname, '/develop/public/notes.html'))
+  res.sendFile(path.join(__dirname, 'public/index.html'))
 );
 
 
